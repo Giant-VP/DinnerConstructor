@@ -10,6 +10,7 @@ public class DinnerConstructor {
     // рандомной генерации блюд по этим ключам(типам)
     HashMap<String,ArrayList<String> > typesAndNamesDishes = new HashMap<>();
     ArrayList<String> typesDishes = new ArrayList<>();
+    Random rnd = new Random(); //ИСПРАВЛЕНИЕ ЗАМЕЧАНИЯ: Добавим поле rnd как экземпляр класса Random, по ТЗ.
 
     //Этот метод будет добавлять типы и названия блюд в таблицу. Перед этим будем проверять, есть такое название блюда
     //в таблице. Если такое блюдо уже есть, уведомляем об этом и просим ввести другое.
@@ -34,7 +35,12 @@ public class DinnerConstructor {
 
 
     //Добавим метод для отображения списка блюд, удобно если не знаешь какие типы и список блюд есть.
+    //ДОРАБОТАНО: добавлена проверка списка, если он пуст, то нечего отображать, просто выходим из метода с уведомлением.
     void printDish(){
+        if (typesAndNamesDishes.isEmpty()){
+            System.out.println("Ваш список блюд пуст, добавьте в него блюда используя команду - 1 основного меню.");
+            return;
+        }
         for (String typeDish : typesAndNamesDishes.keySet()) { //Перебираем ключи таблицы Типов и Названий блюд.
                 System.out.printf("[%s] \n", typeDish); // Выводим тип(группу) блюд.
                 System.out.println(typesAndNamesDishes.get(typeDish)+ "\n"); //Выводим ArrayList список названий блюд в группе.
@@ -57,20 +63,44 @@ public class DinnerConstructor {
     }
 
 
+
+/*
     //Метод для генерации рандомных списков блюд, используя список Типов typesDishes
     ArrayList<String> randomGeneratorDishes () {
         //Создаем список для хранения блюд
         ArrayList<String> namesDishes = new ArrayList<>();
         for (String typeDish : typesDishes) {
-            int length = typesAndNamesDishes.get(typeDish).size(); //Записываем размер полученного списка по Типу(ключу)
-            int randomIndex = new Random().nextInt(length); //Используем размер, для получения рандомного числа не выше размера.
-            namesDishes.add(typesAndNamesDishes.get(typeDish).get(randomIndex));
+            int size = typesAndNamesDishes.get(typeDish).size(); //Записываем размер полученного списка по Типу(ключу)
+            int id = rnd.nextInt(size); //Используем полученный размер, для получения рандомного не выше размера списка
+            namesDishes.add(typesAndNamesDishes.get(typeDish).get(id));
             //Записываем в список рандомное блюдо, которое получаем так -> получаем список по ключу(типу).
             // Получаем элемент из списка по рандомному индексу.
             // Повторяем операцию со всеми типами пользователя.
         }
         return namesDishes;
     }
+*/
+
+    //Метод для генерации рандомных списков блюд, используя список Типов typesDishes
+    /*ВНЕС ИЗМЕНЕНИЕ: метод уже будет возвращать сразу все необходимое кол-во комбинаций блюд.
+      Причина изменения описана в методе generateDishCombo() класса Main, перед вызовом данного метода.
+    */
+    ArrayList<ArrayList<String>> randomGeneratorDishes(int numberOfCombo) {
+        ArrayList<ArrayList<String>> comboDishes = new ArrayList<>(); //итоговый список комбинаций блюд.
+        ArrayList<String> rndDishes = new ArrayList<>(); //список для хранения блюд каждой комбинаций по кол-ву типов блюд
+        for (int i = 0; i < numberOfCombo; i++) {
+            for (String typesDish : typesDishes) {
+                int size = typesAndNamesDishes.get(typesDish).size();
+                int id = rnd.nextInt(size); //ИСПРАВЛЕНИЕ ЗАМЕЧАНИЯ использовал переменную экземпляра класса Random rnd.
+                rndDishes.add(typesAndNamesDishes.get(typesDish).get(id)); //достаем рандомное блюдо из таблицы по типу(ключу)
+                                                                          //и кладем в список рандомных блюд.
+            }
+            comboDishes.add(rndDishes); //полученный спиок рандомных блюд кладем в итоговый список.
+            rndDishes = new ArrayList<>(); //создадим новый объект списка, чтобы записать в него новую комбинацию.
+        }
+        return comboDishes; //Возвращаем итоговый список.
+    }
+
 
     //Метод для проверки введенного пользователем Типа блюда. Проверяем есть ли такой в списке.
     boolean checkType(String typeDish){
